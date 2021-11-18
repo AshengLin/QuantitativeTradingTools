@@ -17,10 +17,7 @@ api.login(person_id=os.getenv('YOUR_PERSON_ID'), passwd=os.getenv('YOUR_PASSWORD
 #     person_id=os.getenv('YOUR_PERSON_ID'),  # 身份證字號
 # )
 
-
 accounts = api.list_accounts()
-
-
 contracts = [api.Contracts.Stocks['2330'], api.Contracts.Stocks['2409']]  # 建立一個Contract的List
 # short_stock_sources = api.short_stock_sources(contracts)  # Short Stock Source 查詢股票代碼,或有券張數, 更新時間
 snapshots = api.snapshots(contracts)  # 查詢快照
@@ -33,14 +30,18 @@ df = pd.DataFrame({**k_bars})
 df.ts = pd.to_datetime(df.ts)
 
 
-order = api.Order(price=12, quantity=1,
-                  action=sj.constant.Action.Buy,  # 買進  sj.constant.Action.Sell, #賣出
-                  price_type=sj.constant.StockPriceType.LMT,
-                  order_type=sj.constant.TFTOrderType.ROD,
-                  order_lot=sj.constant.TFTStockOrderLot.Common,
-                  account=api.stock_account)
-contract = api.Contracts.Stocks['2330']
-trade = api.place_order(contract, order)  # 對該contract 進行 order操作
-print(trade)
+def action(p, q, a):
+    contract = api.Contracts.Stocks['2330']
+    order = api.Order(price=p, quantity=q,
+                      action=a,  # sj.constant.Action.Buy, 買進  sj.constant.Action.Sell, #賣出
+                      price_type=sj.constant.StockPriceType.LMT,
+                      order_type=sj.constant.TFTOrderType.ROD,
+                      order_lot=sj.constant.TFTStockOrderLot.Common,
+                      account=api.stock_account)
+    trade = api.place_order(contract, order)  # 對該contract 進行 order操作
+    print(trade)
 
+
+action(p=12, q=1, a=sj.constant.Action.Buy)
+action(p=15, q=1, a=sj.constant.Action.Sell)
 api.logout()  # 登出
