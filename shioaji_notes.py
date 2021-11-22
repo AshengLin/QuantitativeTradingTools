@@ -44,4 +44,8 @@ def action(p, q, a):
 
 action(p=12, q=1, a=sj.constant.Action.Buy)
 action(p=15, q=1, a=sj.constant.Action.Sell)
+amount_rank = api.scanners(scanner_type=sj.constant.ScannerType.AmountRank,  # 指定所要抓取的排行類型
+                           count=5,  # 抓排行前5名
+                           date='2021-11-22')  # AmountRank 當日成交金額排行, VolumeRank 當日成交量排行 .. etc
+print('rank : ', amount_rank)
 api.logout()  # 登出
