@@ -2,6 +2,7 @@ import pandas as pd
 import shioaji as sj
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv()  # 讀取設定檔中的內容至環境變數，裡面可以放路徑
 api = sj.Shioaji(simulation=True)  # simulation 測試帳號
@@ -48,4 +49,21 @@ amount_rank = api.scanners(scanner_type=sj.constant.ScannerType.AmountRank,  # �
                            count=5,  # 抓排行前5名
                            date='2021-11-22')  # AmountRank 當日成交金額排行, VolumeRank 當日成交量排行 .. etc
 print('rank : ', amount_rank)
+
+'''
+Quote Callback 用來抓即時資料
+訂閱即時 Tick 逐筆成交資料(如果有成交變動), quote_type=bidask，可訂閱即時買賣方五檔價量  (被動)
+或是直接用snapshot，查詢即時資料 (主動)
+'''
+
+
+@api.quote.on_quote
+def quote_callback(topic: str, quote: dict):
+    print(f"Topic: {topic}, Quote: {quote}")
+
+
+api.quote.subscribe(api.Contracts.Stocks["2330"], quote_type='tick')
+time.sleep(10)
+api.quote.unsubscribe(api.Contracts.Stocks["2330"], quote_type='tick')  # 取消訂閱
+
 api.logout()  # 登出
